@@ -1,0 +1,44 @@
+#
+# Copyright (C) 2020 IBM Corporation.
+#
+# Authors:
+# Frederico Araujo <frederico.araujo@ibm.com>
+# Teryl Taylor <terylt@ibm.com>
+#
+# Copied from https://github.com/sysflow-telemetry/sf-deployments/blob/master/docker/docker-compose.processor.yml
+#
+version: "3.5"
+services:
+  sf-processor:
+    container_name: sf-processor
+    image: local-sf-processor:latest
+    volumes:
+      - socket-vol:/sock/
+    environment:
+      DRIVER: socket
+      INPUT_PATH: /sock/sysflow.sock
+    env_file:
+      - ./.env.processor
+  sf-collector:
+    container_name: sf-collector
+    image: sysflowtelemetry/sf-collector:latest
+    depends_on:
+      - "sf-processor"
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/host/var/run/docker.sock
+      - /dev:/host/dev
+      - /proc:/host/proc:ro
+      - /boot:/host/boot:ro
+      - /lib/modules:/host/lib/modules:ro
+      - /usr:/host/usr:ro
+      - /etc:/host/etc:ro
+      - /var/lib:/host/var/lib:ro
+      - socket-vol:/sock/
+    environment:
+      SOCK_FILE: /sock/sysflow.sock
+    env_file:
+      - ./.env.collector
+
+volumes:
+  socket-vol:
