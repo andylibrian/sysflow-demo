@@ -11,7 +11,7 @@ version: "3.5"
 services:
   sf-processor:
     container_name: sf-processor
-    image: local-sf-processor:latest
+    image: sysflowtelemetry/sf-processor:latest
     volumes:
       - socket-vol:/sock/
     environment:
